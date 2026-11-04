@@ -57,58 +57,6 @@
     
 <script>
 
-/* fetch("MyComplaintServlet")
-    .then(response => {
-        if (!response.ok) {
-            throw new Error("Failed to load complaints");
-        }
-        return response.text();
-    })
-    .then(data => {
-        const tbody = document.getElementById("complaintsBody");
-        tbody.innerHTML = "";
-
-        const result = data.trim();
-
-        if (!result || result === "NO_COMPLAINTS") {
-            tbody.innerHTML =
-                '<tr><td colspan="6">No complaints found.</td></tr>';
-            return;
-        }
-
-        if (result === "UNAUTHORIZED" || result === "ERROR") {
-            tbody.innerHTML =
-                '<tr><td colspan="6">Unable to load complaints. Please log in again.</td></tr>';
-            return;
-        }
-
-        const complaints = result.split(/\r?\n/);
-
-        complaints.forEach(line => {
-            if (!line.trim()) return;
-
-            const fields = line.split("\t");
-
-            const row = document.createElement("tr");
-
-            for (let i = 0; i < 6; i++) {
-                const cell = document.createElement("td");
-                cell.textContent = fields[i] || "";
-                row.appendChild(cell);
-            }
-
-            tbody.appendChild(row);
-        });
-    })
-    .catch(error => {
-    console.error("Error loading complaints:", error);
-
-    document.getElementById("complaintsBody").innerHTML =
-        '<tr><td colspan="6">Error: ' + error.message + '</td></tr>';
-});
-*/
-
-
 
 function loadComplaints() {
 
