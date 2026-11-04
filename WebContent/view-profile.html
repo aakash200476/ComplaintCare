@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | Complaint Management System</title>
+
+   <link rel="stylesheet" href="css/viewprofile.css">
+</head>
+
+<body>
+
+    <header>
+        <h2>ComplaintCare<h2>
+
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="LogoutServlet">Logout</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1 class="page-title">My Profile</h1>
+
+        <section class="profile-card">
+            <div class="profile-heading">
+                <div class="profile-avatar" id="profileAvatar">U</div>
+                <h2 id="profileName">Loading profile...</h2>
+                <p>Account Information</p>
+            </div>
+
+            <div class="profile-details">
+                <div class="detail-row">
+                    <span class="detail-label">Full Name</span>
+                    <span class="detail-value" id="fullName">Loading...</span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Email Address</span>
+                    <span class="detail-value" id="email">Loading...</span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Account Role</span>
+                    <span class="detail-value">
+                        <span class="role-badge" id="role">Loading...</span>
+                    </span>
+                </div>
+            </div>
+
+            <p id="message"></p>
+
+            <a href="user-dashboard.html" class="back-btn">
+                Back to Dashboard
+            </a>
+        </section>
+    </main>
+
+    <footer>
+        &copy; 2026 ComplaintCare. All rights reserved.
+    </footer>
+
+    <script>
+    fetch("ViewProfileServlet")
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Unable to load profile.");
+        }
+        return response.text();
+    })
+    .then(data => {
+        const details = data.split(/\r?\n/);
+
+        document.getElementById("profileName").textContent =
+            details[0].trim();
+
+        document.getElementById("fullName").textContent =
+            details[0].trim();
+
+        document.getElementById("email").textContent =
+            details[1].trim();
+
+        document.getElementById("role").textContent =
+            details[2].trim();
+    });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,142 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 10px;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f7fb;
+    color: #202b3c;
+}
+
+/* Navigation Bar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 35px;
+    background: #173b67;
+    color: white;
+}
+
+.navbar h2 {
+    margin: 0;
+}
+
+.navbar nav {
+    display: flex;
+    gap: 22px;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+}
+
+.navbar a:hover {
+    color: #8ec5ff;
+}
+
+/* Login Form */
+.auth-container {
+    min-height: 85vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 16px;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 440px;
+    padding: 32px;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 5px 25px rgba(20, 43, 74, 0.10);
+}
+
+.auth-card h1 {
+    margin-bottom: 8px;
+}
+
+.auth-card > p {
+    color: #657287;
+}
+
+.auth-card label {
+    display: block;
+    margin: 20px 0 8px;
+    font-weight: bold;
+}
+
+.auth-card input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccd5e1;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+.auth-card input:focus {
+    outline: 2px solid #9ac7f7;
+    border-color: #2169b5;
+}
+
+/* Login Button */
+.btn {
+    display: inline-block;
+    border: none;
+    border-radius: 7px;
+    padding: 13px 22px;
+    margin-top: 15px;
+    background: #2169b5;
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background: #174e89;
+}
+
+.full-width {
+    width: 100%;
+}
+
+/* Registration Link */
+.form-footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 14px;
+}
+
+.form-footer a {
+    color: #2169b5;
+}
+
+footer {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+            font-size: 13px;
+        }
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .navbar {
+        padding: 16px 5%;
+    }
+
+    .navbar nav {
+        gap: 12px;
+    }
+
+    .navbar h2 {
+        font-size: 19px;
+    }
+
+    .auth-card {
+        padding: 24px;
+    }
+}

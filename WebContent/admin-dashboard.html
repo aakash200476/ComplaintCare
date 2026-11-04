@@ -1,0 +1,393 @@
+<html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Complaint Management System</title>
+      <link rel="stylesheet" href="css/admindashboard.css">
+</head>
+
+<body>
+
+    <header>
+        <h2>ComplaintCare | Admin</h2>
+
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="LogoutServlet">Logout</a>
+        </nav>
+    </header>
+
+    <main class="container">
+
+        <section class="welcome">
+            <h1>Admin Dashboard</h1>
+            <p>Monitor and manage complaints submitted by users.</p>
+        </section>
+        
+        
+<div class="statistics-container">
+
+    <div class="stat-card">
+        <h3>Total Complaints</h3>
+        <p id="totalCount">-</p>
+    </div>
+
+    <div class="stat-card">
+        <h3>Pending</h3>
+        <p id="pendingCount">-</p>
+    </div>
+
+    <div class="stat-card">
+        <h3>In Progress</h3>
+        <p id="inProgressCount">-</p>
+    </div>
+
+    <div class="stat-card">
+        <h3>Resolved</h3>
+        <p id="resolvedCount">-</p>
+    </div>
+
+</div>
+
+        <section class="table-card">
+            <h2 class="table-heading">All Complaints</h2>
+
+            <button type="button"
+                    class="refresh-btn"
+                    id="refreshBtn"
+                    onclick="loadComplaints()">
+                &#x21BB; Refresh Complaints
+            </button>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Complaint ID</th>
+                            <th>User ID</th>
+                            <th>Category ID</th>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Current Status</th>
+                            <th>Update Status</th>
+                            <th>Admin Response</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="complaintsBody">
+                        <tr>
+                            <td colspan="8" id="message">
+                                Loading complaints...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        &copy; 2026 ComplaintCare. All rights reserved.
+    </footer>
+
+    <script>
+    
+
+    function loadStatistics() {
+        fetch("./AdminStatisticsServlet", {
+            method: "GET",
+            credentials: "same-origin",
+            cache: "no-store"
+        })
+        .then(response => response.text().then(text => {
+            if (!response.ok) {
+                throw new Error("HTTP " + response.status + ": " + text);
+            }
+            return text;
+        }))
+        .then(result => {
+            console.log("Statistics response:", JSON.stringify(result));
+
+            const values = result.trim().split(/\r?\n/);
+
+            if (values.length < 4) {
+                throw new Error("Expected at least four counts, received: " + values.length);
+            }
+
+            const ids = [
+                "totalCount",
+                "pendingCount",
+                "inProgressCount",
+                "resolvedCount"
+            ];
+
+            ids.forEach((id, index) => {
+                const element = document.getElementById(id);
+
+                if (!element) {
+                    throw new Error("Statistics HTML element not found: " + id);
+                }
+
+                element.textContent = values[index].trim();
+            });
+        })
+        .catch(error => {
+            console.error("Statistics loading failed:", error);
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", loadStatistics);
+
+   
+        function loadComplaints() {
+            const tbody = document.getElementById("complaintsBody");
+            const totalElement = document.getElementById("totalCount");
+
+            tbody.innerHTML =
+                '<tr><td colspan="8" id="message">Loading complaints...</td></tr>';
+
+            fetch("./AdminDashboardServlet", {
+                method: "GET",
+                credentials: "same-origin",
+                cache: "no-store"
+            })
+            .then(async function (response) {
+                const data = await response.text();
+
+                if (!response.ok) {
+                    throw new Error("HTTP " + response.status + ": " + data);
+                }
+
+                return data;
+            })
+            .then(function (data) {
+                tbody.innerHTML = "";
+
+                const result = data.trim();
+
+                if (!result || result === "NO_COMPLAINTS") {
+                   <!-- totalElement.textContent = "0";-->
+                    tbody.innerHTML =
+                        '<tr><td colspan="8">No complaints found.</td></tr>';
+                    return;
+                }
+
+                if (result === "UNAUTHORIZED") {
+                    <!--totalElement.textContent = "—";-->
+                    tbody.innerHTML =
+                        '<tr><td colspan="8">Admin session expired. Please log in again.</td></tr>';
+                    return;
+                }
+
+                if (result === "ERROR") {
+                  <!--  totalElement.textContent = "—"; -->
+                    tbody.innerHTML =
+                        '<tr><td colspan="8">Server error while loading complaints.</td></tr>';
+                    return;
+                }
+
+                const complaints = result
+                    .split(/\r?\n/)
+                    .filter(function (line) {
+                        return line.trim() !== "";
+                    });
+
+              <!--  totalElement.textContent = complaints.length; -->
+
+                complaints.forEach(function (line) {
+                    const fields = line.split("\t");
+                    const row = document.createElement("tr");
+
+                    // Fields 0–4: complaint ID, user ID, category ID, title, description
+                    for (let i = 0; i < 5; i++) {
+                        const cell = document.createElement("td");
+                        cell.textContent = fields[i] || "";
+
+                        if (i === 4) {
+                            cell.className = "description";
+                        }
+
+                        row.appendChild(cell);
+                    }
+
+                    // Field 5: Current status
+                    const currentStatusCell = document.createElement("td");
+                    currentStatusCell.textContent = fields[5] || "Pending";
+                    row.appendChild(currentStatusCell);
+
+                    // Update Status dropdown and button
+                    const statusCell = document.createElement("td");
+                    const statusSelect = document.createElement("select");
+
+                    statusSelect.className = "status-select";
+
+                    const statusOptions = [
+                        "Submitted",
+                        "Pending",
+                        "In Progress",
+                        "Resolved"
+                    ];
+
+                    statusOptions.forEach(function (status) {
+                        const option = document.createElement("option");
+                        option.value = status;
+                        option.textContent = status;
+
+                        if ((fields[5] || "Pending").toLowerCase()
+                            === status.toLowerCase()) {
+                            option.selected = true;
+                        }
+
+                        statusSelect.appendChild(option);
+                    });
+
+                    const updateButton = document.createElement("button");
+                    updateButton.type = "button";
+                    updateButton.className = "update-status-btn";
+                    updateButton.textContent = "Update";
+
+                    updateButton.addEventListener("click", function () {
+                        const formData = new URLSearchParams();
+                        formData.append("complaintId", fields[0]);
+                        formData.append("status", statusSelect.value);
+
+                        updateButton.disabled = true;
+                        updateButton.textContent = "Updating...";
+
+                        fetch("UpdateComplaintStatusServlet", {
+                            method: "POST",
+                            credentials: "same-origin",
+                            headers: {
+                                "Content-Type":
+                                    "application/x-www-form-urlencoded"
+                            },
+                            body: formData.toString()
+                        })
+                        .then(async function (response) {
+                            const message = await response.text();
+
+                            if (!response.ok) {
+                                throw new Error(
+                                    "HTTP " + response.status + ": " + message
+                                );
+                            }
+
+                            return message;
+                        })
+                        .then(function (message) {
+                            alert(message.trim());
+
+                            // Reload data from the server after the update.
+                            loadComplaints();
+                        })
+                        .catch(function (error) {
+                            console.error("Status update failed:", error);
+                            alert("Could not update status: " + error.message);
+                        })
+                        .finally(function () {
+                            updateButton.disabled = false;
+                            updateButton.textContent = "Update";
+                        });
+                    });
+
+                    statusCell.appendChild(statusSelect);
+                    statusCell.appendChild(document.createElement("br"));
+                    statusCell.appendChild(updateButton);
+                    row.appendChild(statusCell);
+
+                    // Field 7: Admin response, with Save button
+                    const responseCell = document.createElement("td");
+                    const responseInput = document.createElement("textarea");
+
+                    responseInput.className = "admin-response-input";
+                    responseInput.rows = 2;
+                    responseInput.placeholder = "Enter admin response";
+                    responseInput.value = fields[7] || "";
+
+                    const saveButton = document.createElement("button");
+                    saveButton.type = "button";
+                    saveButton.className = "save-response-btn";
+                    saveButton.textContent = "Save";
+
+                    saveButton.addEventListener("click", function () {
+                        const formData = new URLSearchParams();
+                        formData.append("complaintId", fields[0]);
+                        formData.append("adminResponse", responseInput.value);
+
+                        saveButton.disabled = true;
+                        saveButton.textContent = "Saving...";
+
+                        fetch("UpdateAdminResponseServlet", {
+                            method: "POST",
+                            credentials: "same-origin",
+                            headers: {
+                                "Content-Type":
+                                    "application/x-www-form-urlencoded"
+                            },
+                            body: formData.toString()
+                        })
+                        .then(async function (response) {
+                            const message = await response.text();
+
+                            if (!response.ok) {
+                                throw new Error(
+                                    "HTTP " + response.status + ": " + message
+                                );
+                            }
+
+                            return message;
+                        })
+                        .then(function (message) {
+                            alert(message.trim());
+                            loadComplaints();
+                        })
+                        .catch(function (error) {
+                            console.error(
+                                "Error saving admin response:", error
+                            );
+                            alert(
+                                "Could not save the response: " + error.message
+                            );
+                        })
+                        .finally(function () {
+                            saveButton.disabled = false;
+                            saveButton.textContent = "Save";
+                        });
+                    });
+
+                    responseCell.appendChild(responseInput);
+                    responseCell.appendChild(document.createElement("br"));
+                    responseCell.appendChild(saveButton);
+                    row.appendChild(responseCell);
+
+                    tbody.appendChild(row);
+                });
+
+                console.log("Admin complaints displayed:", complaints.length);
+            })
+            .catch(function (error) {
+                console.error("Failed to load admin complaints:", error);
+
+                totalElement.textContent = "—";
+                tbody.innerHTML = "";
+
+                const row = document.createElement("tr");
+                const cell = document.createElement("td");
+
+                cell.colSpan = 8;
+                cell.textContent =
+                    "Unable to load complaints: " + error.message;
+
+                row.appendChild(cell);
+                tbody.appendChild(row);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", loadComplaints);
+    </script>
+
+</body>
+</html>

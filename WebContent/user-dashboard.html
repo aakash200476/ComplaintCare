@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard | ComplaintCare</title>
+    
+    <link rel="stylesheet" href="css/userdashboard.css">
+    </head>
+       <body>
+           <header>
+               <h2>ComplaintCare</h2>
+               
+               <span id="welcomeUser">Hii!</span>
+               <nav>
+               <a href="index.html">Home</a>
+    <a href="LogoutServlet">Logout</a>
+    </nav>
+           </header>
+           
+            <main>
+               <section class="welcome">
+        <h1>Welcome to Your Dashboard!</h1>
+        <p>Manage your complaints and track their status easily.</p>
+               </section>
+    
+                   <section class="cards">
+        <div class="card">
+            <h3>Submit Complaint</h3>
+            <p>Report a new issue and provide its details.</p>
+            <a class="action" href="submit-complaint.html">
+                Submit Now
+            </a>
+        </div>
+        
+        <div class="card">
+            <h3>My Complaints</h3>
+            <p>View your submitted complaints and their status.</p>
+            <a class="action" href="my-complaints.html">
+                View Complaints
+             </a>
+        </div>
+        
+        <div class="card">
+            <h3>My Profile</h3>
+            <p>View your account and personal information.</p>
+            <a class="action" href="view-profile.html">
+                View Profile
+            </a>
+        </div>
+    </section>
+            </main>
+            
+             <footer>
+    &copy; 2026 ComplaintCare. All rights reserved.
+            </footer>
+            
+            <script>
+               fetch("CurrentUserNameServlet").then(response => {
+                     if (!response.ok) {
+                             throw new Error("Unable to load username");
+                     }
+            	      return response.text();
+})
+          .then(name => {
+                 document.getElementById("welcomeUser").textContent = "Hii, " + name + "!";
+})
+          .catch(error => {
+              console.error(error);
+              document.getElementById("welcomeUser").textContent = "Hii!";
+          });
+            </script>
+       </body>
+</html>

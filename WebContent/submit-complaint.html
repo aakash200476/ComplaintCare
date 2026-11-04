@@ -1,0 +1,115 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Submit Complaint</title>
+
+   <link rel="stylesheet" href="css/submitcomplaint.css">
+</head>
+
+<body>
+
+<header>
+          <h2>ComplaintCare<h2>
+        
+        
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="LogoutServlet">Logout</a>
+        </nav>
+</header>
+
+<div class="container">
+
+    <h1>Submit a Complaint</h1>
+    <p>Please provide the details of your issue below.</p>
+
+    <div id="message" role="status" aria-live="polite"></div>
+
+    <form action="SubmitComplaintServlet" method="post">
+
+        <label for="title">Complaint Title</label>
+        <input
+            type="text"
+            id="title"
+            name="title"
+            maxlength="200"
+            required
+        >
+
+          <label for="categoryId">Category ID</label>
+        <input
+            type="number"
+            id="categoryId"
+            name="categoryId"
+            min="1"
+            max="7"
+            step="1"
+            required
+        >
+           
+        
+
+        <label for="description">Complaint Description</label>
+        <textarea
+            id="description"
+            name="description"
+            maxlength="5000"
+            required
+        ></textarea>
+
+       <div class="category-note">
+    <strong>Note:</strong> Please select the appropriate complaint category.
+    <ul>
+        <li>ID 1 – Electrical</li>
+        <li>ID 2 – Water</li>
+        <li>ID 3 – Cleanliness</li>
+        <li>ID 4 – Infrastructure</li>
+        <li>ID 5 – Internet</li>
+        <li>ID 6 – Academic</li>
+        <li>ID 7 – Other</li>
+    </ul>
+</div>
+       
+        <button type="submit">Submit Complaint</button>
+    </form>
+</div>
+<div class="back-container">
+    <a class="back" href="user-dashboard.html">Back to Dashboard</a>
+
+</div>
+
+<footer>
+        &copy; 2026 ComplaintCare. All rights reserved.
+    </footer>
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const message = document.getElementById("message");
+
+    if (params.get("success") === "1") {
+        message.className = "message success";
+        message.textContent =
+            "Complaint submitted successfully!";
+
+    } else if (params.has("error")) {
+        message.className = "message error";
+
+        const errors = {
+            empty: "Please fill in all required fields.",
+            invalid: "Please enter valid complaint details.",
+            save: "Unable to save your complaint. Please try again."
+        };
+
+        message.textContent =
+            errors[params.get("error")] ||
+            "Please log in and try again.";
+    }
+    
+    
+</script>
+
+</body>
+</html>

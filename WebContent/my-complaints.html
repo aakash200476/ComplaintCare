@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Complaints | Complaint Management System</title>
+
+    <link rel="stylesheet" href="css/mycomplaints.css">
+</head>
+
+<body>
+
+    <header>
+        <h2>ComplaintCare<h2>
+
+        <nav>
+            <a href="index.html">Home</a>
+           <a href="LogoutServlet">Logout</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>My Complaints</h1>
+        <p class="subtitle">View the complaints you have submitted.</p>
+
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Complaint ID</th>
+                        <th>Title</th>
+                        <th>Category ID</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Admin Response</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody id="complaintsBody">
+                    <tr>
+                        <td colspan="7" id="message">Loading your complaints...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <a href="user-dashboard.html" class="back-btn">
+            Back to Dashboard
+        </a>
+    </main>
+
+    <footer>
+        &copy; 2026 ComplaintCare. All rights reserved.
+    </footer>
+
+    
+<script>
+
+/* fetch("MyComplaintServlet")
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Failed to load complaints");
+        }
+        return response.text();
+    })
+    .then(data => {
+        const tbody = document.getElementById("complaintsBody");
+        tbody.innerHTML = "";
+
+        const result = data.trim();
+
+        if (!result || result === "NO_COMPLAINTS") {
+            tbody.innerHTML =
+                '<tr><td colspan="6">No complaints found.</td></tr>';
+            return;
+        }
+
+        if (result === "UNAUTHORIZED" || result === "ERROR") {
+            tbody.innerHTML =
+                '<tr><td colspan="6">Unable to load complaints. Please log in again.</td></tr>';
+            return;
+        }
+
+        const complaints = result.split(/\r?\n/);
+
+        complaints.forEach(line => {
+            if (!line.trim()) return;
+
+            const fields = line.split("\t");
+
+            const row = document.createElement("tr");
+
+            for (let i = 0; i < 6; i++) {
+                const cell = document.createElement("td");
+                cell.textContent = fields[i] || "";
+                row.appendChild(cell);
+            }
+
+            tbody.appendChild(row);
+        });
+    })
+    .catch(error => {
+    console.error("Error loading complaints:", error);
+
+    document.getElementById("complaintsBody").innerHTML =
+        '<tr><td colspan="6">Error: ' + error.message + '</td></tr>';
+});
+*/
+
+
+
+function loadComplaints() {
+
+    fetch("MyComplaintServlet")
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Failed to load complaints");
+            }
+            return response.text();
+        })
+        .then(data => {
+
+            const tbody = document.getElementById("complaintsBody");
+            tbody.innerHTML = "";
+
+            const result = data.trim();
+
+            if (!result || result === "NO_COMPLAINTS") {
+                tbody.innerHTML =
+                    '<tr><td colspan="7">No complaints found.</td></tr>';
+                return;
+            }
+
+            if (result === "UNAUTHORIZED" || result === "ERROR") {
+                tbody.innerHTML =
+                    '<tr><td colspan="7">Unable to load complaints. Please log in again.</td></tr>';
+                return;
+            }
+
+            const complaints = result.split(/\r?\n/);
+
+            complaints.forEach(line => {
+
+                if (!line.trim()) return;
+
+                const fields = line.split("\t");
+
+                const row = document.createElement("tr");
+
+                // Display existing complaint details
+                for (let i = 0; i < 6; i++) {
+
+                    const cell = document.createElement("td");
+                    cell.textContent = fields[i] || "";
+                    row.appendChild(cell);
+                }
+
+                // Action column
+                const actionCell = document.createElement("td");
+
+                const complaintId = fields[0];
+                const status = (fields[4] || "").trim();
+
+                if (status.toLowerCase() === "pending") {
+
+                    const deleteButton = document.createElement("button");
+
+                    deleteButton.textContent = "Delete";
+                    deleteButton.className = "delete-btn";
+
+                    deleteButton.addEventListener("click", function () {
+                        deleteComplaint(complaintId);
+                    });
+
+                    actionCell.appendChild(deleteButton);
+
+                } else {
+
+                    actionCell.textContent = "Not Available";
+                }
+
+                row.appendChild(actionCell);
+                tbody.appendChild(row);
+            });
+        })
+        .catch(error => {
+
+            console.error("Error loading complaints:", error);
+
+            document.getElementById("complaintsBody").innerHTML =
+                '<tr><td colspan="7">Error: ' +
+                error.message + '</td></tr>';
+        });
+}
+
+
+// Delete complaint
+function deleteComplaint(complaintId) {
+
+    const confirmDelete = confirm(
+        "Are you sure you want to delete complaint #" +
+        complaintId + "?"
+    );
+
+    if (!confirmDelete) {
+        return;
+    }
+
+    fetch("DeleteComplaintServlet", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+
+        body: new URLSearchParams({
+            complaintId: complaintId
+        })
+
+    })
+    .then(response => response.text())
+    .then(result => {
+
+        result = result.trim();
+
+        if (result === "SUCCESS") {
+
+            alert("Complaint deleted successfully!");
+
+            // Refresh complaints automatically
+            loadComplaints();
+
+        } else if (result === "UNAUTHORIZED") {
+
+            alert("Please log in again.");
+
+        } else if (result === "NOT_DELETED") {
+
+            alert("Complaint could not be deleted. It may no longer be pending or may not belong to you.");
+
+        } else if (result === "ERROR") {
+
+            alert("Database error occurred. Check Eclipse Console for details.");
+
+        } else {
+
+            alert("Unexpected server response: " + result);
+        }
+    })
+    .catch(error => {
+
+        console.error("Delete error:", error);
+
+        alert("Unable to delete complaint. Please try again.");
+    });
+}
+
+
+// Load complaints when page opens
+loadComplaints();
+
+</script>
+    
+
+</body>
+</html>
