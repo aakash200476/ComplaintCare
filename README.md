@@ -74,6 +74,7 @@ The application uses Java Servlets and JDBC for backend processing and MySQL for
 - Dynamic Data Retrieval
 - Separate User and Admin Dashboards
 - User-Friendly Interface
+- Password hashing for security
 
 ---
 
@@ -97,6 +98,7 @@ The application uses Java Servlets and JDBC for backend processing and MySQL for
 ### Libraries and Dependencies
 
 - MySQL Connector/J – Database connectivity.
+- jbcrypt - password hashing
   
 ---
 
@@ -190,6 +192,7 @@ Stores registered user and administrator information.
 | email | User's email address |
 | password | User's password/hash |
 | role | User role (user/admin) |
+| created_at | date & time of creation |
 
 **2. Complaints Table**
 
@@ -204,6 +207,8 @@ Stores complaints submitted by users.
 | description | Complaint description |
 | status | Current complaint status |
 | admin_response | Administrator's response |
+| created_at | date & time of creation |
+| updated_at | date & time of updation |
 
 **3. Complaint Categories Table**
 
